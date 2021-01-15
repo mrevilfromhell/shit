@@ -1,0 +1,12 @@
+#!/bin/bash
+
+mkdir /opt/postgresql-nopaper-backup/$(date '+%m-%d-%Y')
+
+#create postgresql backup
+pg_basebackup -h localhost -p 5432 -D /opt/postgresql-nopaper-backup/$(date '+%m-%d-%Y') -U postsqldba
+
+#archives postgresql backup
+tar -cvf /opt/postgresql-nopaper-backup/postgresql-nopaper-$(date '+%m-%d-%Y').tar /opt/postgresql-nopaper-backup/$(date '+%m-%d-%Y')
+
+#sent postgresql backup to object-storage
+aws --endpoint-url=https://storage.yandexcloud.net s3 cp /opt/postgresql-nopaper-backup/postgresql-nopaper-$(date '+%m-%d-%Y').tar s3://db-master-nopaper-backup/
